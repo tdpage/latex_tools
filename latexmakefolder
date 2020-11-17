@@ -1,0 +1,158 @@
+#!/bin/bash 
+
+# This script makes a folder file structure for writing EE5144 reports
+
+
+## Constants
+RIGHT_NOW="$(date +"%x %r %Z")"
+TIME_STAMP="Updated $RIGHT_NOW by $USER"
+
+## Functions
+
+make_file_structure(){
+    for i in img circuit table tex; do
+        [ -d "$i" ] || mkdir "$i"
+    done
+}
+
+write_preamble(){
+    cat <<- _EOF_
+% Written by Thomas Page 
+% $TIME_STAMP
+
+%--Preamble------------------------------------------------------------------------------
+\documentclass{scrartcl} % using the Koma class substitute for the Article default class
+
+% add packages here.
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[american,nooldvoltagedirection]{circuitikz}
+_EOF_
+}
+
+write_body(){
+    cat <<- _EOF_
+
+%--Body----------------------------------------------------------------------------------
+\begin{document}
+    \title{Homework XX}
+    \subject{EExxxx}
+    \author{Thomas Page}
+    \date{$(date +"%m/%d/%Y")}
+    \maketitle
+    
+    % body goes here
+    % \input{img/example_img.tex}
+    \input{table/example_table.tex}
+    \input{circuit/example_circuit.tex}
+    
+\end{document}
+_EOF_
+}
+
+write_img_example(){
+    cat <<- _EOF_
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{./img/example.jpg}
+    \caption[The caption that appears in the TOC]{The caption that appears below the image}
+    \label{fig:example_img}
+\end{figure} 
+_EOF_
+}
+
+write_table_example(){
+    cat <<- _EOF_
+\begin{table}[!htbp]
+    \centering
+    \begin{tabular}{|r|l|}
+    \hline
+    7C0 & hexadecimal \\\\
+    3700 & octal \\\\ \cline{2-2}
+    11111000000 & binary \\\\
+    \hline \hline
+    1984 & decimal \\\\
+    \hline
+    \end{tabular}
+    \caption[Different numerical bases]{Hexadecimal, Octal, Binary, and Decimal numerical bases}
+    \label{tab:numericalbases}
+\end{table}
+_EOF_
+}
+
+write_circuit_example(){
+    cat <<- _EOF_
+
+\begin{center}
+\begin{circuitikz}
+
+    \draw (0,0) node[npn](npn1) {}
+    ;
+    
+    \draw (npn1.B) to[short, -o] +(-1,0)
+                   node[label=left:\$B\$]{}
+    ;
+
+    \draw (npn1.C) to[short, -o] +(0,1)
+                   node[label=left:\$C\$]{}
+    ;
+
+    \draw (npn1.E) to[short, -o] +(0,-1)
+                   node[label=left:\$E\$]{}
+    ;
+
+\end{circuitikz}
+\end{center}
+_EOF_
+}
+
+write_examples(){
+    [ -f img/example_image.tex ] || write_img_example >> img/example_image.tex
+    [ -f table/example_table.tex ] || write_table_example >> table/example_table.tex
+    [ -f circuit/example_circuit.tex ] || write_circuit_example >> circuit/example_circuit.tex
+}
+
+write_file(){
+    write_preamble
+    write_body
+}
+
+usage(){
+    echo "usage: latexmakefolder [[[-f filename ] [-p project name] [-t assignment type]] | [-c compile latex to pdf] [-h]]"
+}
+
+## Main
+
+filename=""$USER"_document.tex"
+folder="latex"
+type="homework"
+while [ "$1" != "" ]; do
+    case $1 in
+        -f | --file    )        shift
+                                filename=$1
+                                ;;
+        -p | --project )        shift
+                                folder=$1
+                                ;;
+        -t | --type    )        shift
+                                type=$1
+                                ;;                                
+        -c | --compile )        compileFlag="1"
+                                ;;
+        -h | --help    )        usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+[ -d "$folder" ] || mkdir "$folder" # If $folder doesn't exist, make it
+cd "$folder"
+make_file_structure
+write_examples
+[ -f "$filename" ] || write_file >> "$filename" # If $filename doesn't exist, make it
+[ "$compileFlag" = "1" ] && pdflatex "$filename" # if $compileFlag is true, make pdf
+cd - > /dev/null

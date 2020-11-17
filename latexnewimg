@@ -1,0 +1,77 @@
+#!/bin/bash 
+
+# This is an example script for writing bash scripts with command-line inputs
+
+## Constants
+RIGHT_NOW="$(date +"%x %r %Z")"
+TIME_STAMP="Updated $RIGHT_NOW by $USER"
+
+## Functions
+
+write_file(){
+    cat <<- _EOF_
+%$TIME_STAMP
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{./img/$subfolder$imgname.$ext}
+    \caption[$caption_toc]{$caption}
+    \label{fig:$label}
+\end{figure}
+_EOF_
+}
+
+update(){
+echo \\input\{./img/"$subfolder""$filename"} >> listofcharts.tex 
+echo \\\ref{fig:"$label"} >> listofreferences.tex
+}
+
+usage(){
+    echo "usage: latexnewimg [[[-f filename ] [-c caption] [-t \"TOC caption\"] [-l label] [-e picture extension] [-s subfolder/]] | [[-u] [-h]]]"
+    echo "Creates a new LaTeX file that links to a image file with the same name."
+}
+
+## Main
+
+filename=new_img.tex
+caption="$filename"
+caption_toc="$caption"
+
+ext="png"
+# read flags
+while [ "$1" != "" ]; do
+    case $1 in
+        -f | --file      )      shift
+                                filename=$1
+                                ;;
+        -c | --caption   )      shift
+                                caption=$1
+                                ;;
+        -t | --toc       )      shift
+                                caption_toc=$1
+                                ;;
+        -l | --label     )      shift
+                                label=$1
+                                ;;
+        -e | --extension )      shift
+                                ext=$1
+                                ;;
+        -s | --subfolder )      shift
+                                subfolder=$1
+                                ;;                                
+        -u | --update    )      updateFlag=1
+                                ;;
+        -h | --help      )      usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+caption_toc="$caption"
+# main script
+imgname=${filename%.*}
+label=${filename%.*}
+[[ -f "$filename" ]] || write_file > "$filename" # if file doesn't exist, make it
+[[ $updateFlag = 1 ]] && update
+
