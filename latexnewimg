@@ -10,10 +10,10 @@ TIME_STAMP="Updated $RIGHT_NOW by $USER"
 
 write_file(){
     cat <<- _EOF_
-%$TIME_STAMP
+% $TIME_STAMP
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth]{./img/$subfolder$imgname.$ext}
+    \includegraphics[width=\textwidth]{./$imgfolder$subfolder$imgname.$ext}
     \caption[$caption_toc]{$caption}
     \label{fig:$label}
 \end{figure}
@@ -21,7 +21,7 @@ _EOF_
 }
 
 update(){
-echo \\input\{./img/"$subfolder""$filename"} >> listofcharts.tex 
+echo \\input\{./"$imgfolder""$subfolder""$filename"} >> listofimg.tex 
 echo \\\ref{fig:"$label"} >> listofreferences.tex
 }
 
@@ -35,8 +35,15 @@ usage(){
 filename=new_img.tex
 caption="$filename"
 caption_toc="$caption"
-
 ext="png"
+
+# if the img/ directory exists, put the files there. If not, then place in current dir
+if [[ -d "./img/" ]]; then
+    imgfolder="img/"
+else
+    imgfolder=""
+fi
+
 # read flags
 while [ "$1" != "" ]; do
     case $1 in
@@ -57,6 +64,9 @@ while [ "$1" != "" ]; do
                                 ;;
         -s | --subfolder )      shift
                                 subfolder=$1
+                                ;;
+        -i | --imgfolder )      shift
+                                imgfolder=$1
                                 ;;                                
         -u | --update    )      updateFlag=1
                                 ;;
@@ -72,6 +82,7 @@ caption_toc="$caption"
 # main script
 imgname=${filename%.*}
 label=${filename%.*}
-[[ -f "$filename" ]] || write_file > "$filename" # if file doesn't exist, make it
+[[ -d "./$imgfolder$subfolder" ]] || mkdir -p "./$imgfolder$subfolder" # if imgdir and subdir don't exist, make them
+[[ -f "./$imgfolder$subfolder$filename" ]] || write_file > "./$imgfolder$subfolder$filename" # if file doesn't exist, make it
 [[ $updateFlag = 1 ]] && update
 
