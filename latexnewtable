@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# This script makes new table latex docs with cli options
+
+## Constants
+RIGHT_NOW="$(date +"%x %r %Z")"
+TIME_STAMP="Updated $RIGHT_NOW by $USER"
+TYPE="table"
+TYPEDIR="$TYPE/"
+
+## Functions
+
+write_file(){
+    cat <<- _EOF_
+\begin{table}[!htbp]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Header 1 & Header 2 \\\\
+        \hline
+    \end{tabular}
+    \caption[$toc_caption]{$caption}
+    \label{tab:$label}
+\end{table}
+_EOF_
+}
+
+update(){
+    echo "\input{./$dir$filename}" >> listoffloats.tex 
+    echo "\ref{fig:$label}" >> listofrefs.tex
+}
+
+usage(){
+    echo "usage: $0 [option]..."    
+}
+
+help(){
+    usage
+    echo "Add a new $TYPE .tex file to the LaTeX document."
+    echo
+    echo "  -o,  --output              output filename         (filename.tex)"
+    echo "  -d,  --directory           directory                       (img/)"
+    echo "  -c,  --caption             caption text          (\"A cool table\")"
+    echo "  -t,  --toc                 TOC text              (\"A cool table\")"
+    echo "  -l,  --label               reference label           (cool_table)"
+#     echo "  -e,  --ext                 image file extension            (.png)"
+    echo "  -u,  --update              update listofrefs.tex and listoffloats.tex"
+    echo "  -h,  --help                display this help and exit"
+    echo
+    echo "Visit https://github.com/tdpage/latex_tools for more info"
+}
+
+## Main
+
+# initialize some fields
+filename=       # filename including extension
+imgname=
+directory=      # directory to place file
+caption=        # caption under the float 
+toc_caption=    # caption that appears in TOC
+label=          # reference label tag
+ext="png"       # file extension if linking to external file
+updateFlag=     # add file and ref to listofimg.tex and listofref.tex
+
+# read flags
+while [ "$1" != "" ]; do
+    case $1 in
+        -o | --output    )      shift
+                                filename=$1
+                                ;;
+        -d | --directory )      shift
+                                dir=$1
+                                ;;
+        -c | --caption   )      shift
+                                caption=$1
+                                ;;
+        -t | --toc       )      shift
+                                toc_caption=$1
+                                ;;
+        -l | --label     )      shift
+                                label=$1
+                                ;;
+        -u | --update    )      updateFlag=1
+                                ;;
+        -h | --help      )      help
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
+# if certain fields haven't been entered, set some defaults based on the filename
+[[ "$filename" = "" ]]    && filename="new_table.tex"
+# [[ "$imgname" = "" ]]     && imgname=${filename%.*} # filename without extension
+# [[ "$dir" = "" ]]         && dir=""
+[[ "$caption" = "" ]]     && caption=${filename%.*} 
+[[ "$toc_caption" = "" ]] && toc_caption=${filename%.*}
+[[ "$label" = "" ]]       && label=${filename%.*}
+# [[ "$ext" = "png" ]]      && ext="png"
+
+# if filetype directory exists, add it to dir
+if [[ -d "./$TYPEDIR" ]]; then
+    dir="$TYPEDIR""$dir"
+fi
+
+# do some work
+[[ -d "./$dir" ]] || mkdir -p ./$dir
+[[ -f "./$dir$filename" ]] || write_file > ./$dir$filename
+[[ "$updateFlag" ]] && update
+exit 0
