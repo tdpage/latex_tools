@@ -1,10 +1,13 @@
 #!/bin/bash 
 
-# This is an example script for writing bash scripts with command-line inputs
+# This script makes new img latex files with cli options
 
 ## Constants
+
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
+TYPE="img"
+TYPEDIR="$TYPE/"
 
 ## Functions
 
@@ -13,48 +16,64 @@ write_file(){
 % $TIME_STAMP
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth]{./$imgfolder$subfolder$imgname.$ext}
-    \caption[$caption_toc]{$caption}
+    \includegraphics[width=\textwidth]{./$dir$imgname.$ext}
+    \caption[$toc_caption]{$caption}
     \label{fig:$label}
 \end{figure}
 _EOF_
 }
 
 update(){
-echo \\input\{./"$imgfolder""$subfolder""$filename"} >> listofimg.tex 
-echo \\\ref{fig:"$label"} >> listofreferences.tex
+    echo "\input{./$dir$filename}" >> listofimg.tex 
+    echo "\ref{fig:$label}" >> listofreferences.tex
 }
 
 usage(){
-    echo "usage: latexnewimg [[[-f filename ] [-c caption] [-t \"TOC caption\"] [-l label] [-e picture extension] [-s subfolder/]] | [[-u] [-h]]]"
-    echo "Creates a new LaTeX file that links to a image file with the same name."
+    echo "usage: $0 [option]..."    
+}
+
+help(){
+    usage
+    echo "Add a new $TYPE .tex file to the LaTeX document."
+    echo
+    echo "  -o,  --output              output filename         (filename.tex)"
+    echo "  -d,  --directory           directory                       (img/)"
+    echo "  -c,  --caption             caption text            (\"A cool pic\")"
+    echo "  -t,  --toc                 TOC text                (\"A cool pic\")"
+    echo "  -l,  --label               reference label             (cool_pic)"
+    echo "  -e,  --ext                 image file extension            (.png)"
+    echo "  -u,  --update              update listofref.tex and listofimg.tex"
+    echo "  -h,  --help                display this help and exit"
+    echo
+    echo "Visit https://github.com/tdpage/latex_tools for more info"
 }
 
 ## Main
 
-filename=new_img.tex
-caption="$filename"
-caption_toc="$caption"
-ext="png"
-
-# if the img/ directory exists, put the files there. If not, then place in current dir
-if [[ -d "./img/" ]]; then
-    imgfolder="img/"
-else
-    imgfolder=""
-fi
+# initialize some fields
+filename=       # filename including extension
+imgname=        # 
+directory=      # directory to place file
+caption=        # caption under the float 
+toc_caption=    # caption that appears in TOC
+label=          # reference label tag
+ext="png"       # file extension if linking to external file
+updateFlag=     # add file and ref to listofimg.tex and listofref.tex
 
 # read flags
 while [ "$1" != "" ]; do
     case $1 in
-        -f | --file      )      shift
+        -o | --output    )      shift
                                 filename=$1
+                                ;;
+        -d | --directory )      shift
+                                dir=$1
                                 ;;
         -c | --caption   )      shift
                                 caption=$1
                                 ;;
         -t | --toc       )      shift
-                                caption_toc=$1
+                                toc_caption=$1
                                 ;;
         -l | --label     )      shift
                                 label=$1
@@ -62,15 +81,9 @@ while [ "$1" != "" ]; do
         -e | --extension )      shift
                                 ext=$1
                                 ;;
-        -s | --subfolder )      shift
-                                subfolder=$1
-                                ;;
-        -i | --imgfolder )      shift
-                                imgfolder=$1
-                                ;;                                
         -u | --update    )      updateFlag=1
                                 ;;
-        -h | --help      )      usage
+        -h | --help      )      help
                                 exit
                                 ;;
         * )                     usage
@@ -78,11 +91,27 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
-caption_toc="$caption"
-# main script
-imgname=${filename%.*}
-label=${filename%.*}
-[[ -d "./$imgfolder$subfolder" ]] || mkdir -p "./$imgfolder$subfolder" # if imgdir and subdir don't exist, make them
-[[ -f "./$imgfolder$subfolder$filename" ]] || write_file > "./$imgfolder$subfolder$filename" # if file doesn't exist, make it
-[[ $updateFlag = 1 ]] && update
+
+# if certain fields haven't been entered, set some defaults based on the filename
+[[ "$filename" = "" ]]    && filename="new_img.tex"
+# [[ "$dir" = "" ]]         && dir=""
+[[ "$caption" = "" ]]     && caption=${filename%.*}
+[[ "$toc_caption" = "" ]] && toc_caption=${filename%.*}
+[[ "$label" = "" ]]       && label=${filename%.*}
+[[ "$ext" = "png" ]]      && ext="png"
+ 
+
+imgname=${filename%.*} # name of image is same as filename without extension
+ 
+# if filetype directory exists, add it to dir
+if [[ -d "./$TYPEDIR" ]]; then
+    dir="$TYPEDIR""$dir"
+fi
+
+# do some work
+[[ -d "./$dir" ]] || mkdir -p ./$dir
+[[ -f "./$dir$filename" ]] || write_file > ./$dir$filename
+[[ "$updateFlag" ]] && update
+exit 0
+
 
