@@ -37,11 +37,11 @@ help(){
     echo "Add a new $TYPE .tex file to the LaTeX document."
     echo
     echo "  -o,  --output              output filename         (filename.tex)"
-    echo "  -d,  --directory           directory                       (img/)"
-    echo "  -c,  --caption             caption text            (\"A cool pic\")"
-    echo "  -t,  --toc                 TOC text                (\"A cool pic\")"
-    echo "  -l,  --label               reference label             (cool_pic)"
-    echo "  -e,  --ext                 image file extension            (.png)"
+    echo "  -d,  --directory           directory               ($TYPE/)"
+    echo "  -c,  --caption             caption text            (\"A cool $TYPE\")"
+    echo "  -t,  --toc                 TOC text                (\"A cool $TYPE\")"
+    echo "  -l,  --label               reference label         (cool_$TYPE)"
+    echo "  -e,  --ext                 image file extension    (.png)"
     echo "  -u,  --update              update listofrefs.tex and listoffloats.tex"
     echo "  -h,  --help                display this help and exit"
     echo
@@ -93,7 +93,7 @@ while [ "$1" != "" ]; do
 done
 
 # if certain fields haven't been entered, set some defaults based on the filename
-[[ "$filename" = "" ]]    && filename="new_img.tex"
+[[ "$filename" = "" ]]    && filename="new_$TYPE.tex"
 # [[ "$dir" = "" ]]         && dir=""
 [[ "$caption" = "" ]]     && caption=${filename%.*}
 [[ "$toc_caption" = "" ]] && toc_caption=${filename%.*}
