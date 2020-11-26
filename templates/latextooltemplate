@@ -24,7 +24,7 @@ _EOF_
 }
 
 update(){
-    echo "\input{./$dir$filename"} >> listofimg.tex 
+    echo "\input{./$dir$filename}" >> listofimg.tex 
     echo "\ref{fig:$label}" >> listofreferences.tex
 }
 
@@ -94,9 +94,9 @@ done
 
 # if certain fields haven't been entered, set some defaults based on the filename
 [[ "$filename" = "" ]]    && filename="new_img.tex"
-[[ "$imgname" = "" ]]     && imgname=${filename%.*}
+[[ "$imgname" = "" ]]     && imgname=${filename%.*} # filename without extension
 # [[ "$dir" = "" ]]         && dir=""
-[[ "$caption" = "" ]]     && caption=${filename%.*} # filename without extension
+[[ "$caption" = "" ]]     && caption=${filename%.*} 
 [[ "$toc_caption" = "" ]] && toc_caption=${filename%.*}
 [[ "$label" = "" ]]       && label=${filename%.*}
 [[ "$ext" = "png" ]]      && ext="png"
