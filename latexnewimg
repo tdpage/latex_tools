@@ -24,8 +24,8 @@ _EOF_
 }
 
 update(){
-    echo "\input{./$dir$filename}" >> listofimg.tex 
-    echo "\ref{fig:$label}" >> listofreferences.tex
+    echo "\input{./$dir$filename}" >> listoffloats.tex 
+    echo "\ref{fig:$label}" >> listofrefs.tex
 }
 
 usage(){
@@ -42,7 +42,7 @@ help(){
     echo "  -t,  --toc                 TOC text                (\"A cool pic\")"
     echo "  -l,  --label               reference label             (cool_pic)"
     echo "  -e,  --ext                 image file extension            (.png)"
-    echo "  -u,  --update              update listofref.tex and listofimg.tex"
+    echo "  -u,  --update              update listofrefs.tex and listoffloats.tex"
     echo "  -h,  --help                display this help and exit"
     echo
     echo "Visit https://github.com/tdpage/latex_tools for more info"
@@ -100,8 +100,8 @@ done
 [[ "$label" = "" ]]       && label=${filename%.*}
 [[ "$ext" = "png" ]]      && ext="png"
  
-
-imgname=${filename%.*} # name of image is same as filename without extension
+# name of image is same as filename without extension
+imgname=${filename%.*}
  
 # if filetype directory exists, add it to dir
 if [[ -d "./$TYPEDIR" ]]; then
