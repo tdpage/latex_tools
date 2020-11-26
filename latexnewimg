@@ -6,6 +6,7 @@
 
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
+SCRIPT="$(basename $0)"
 TYPE="img"
 TYPEDIR="$TYPE/"
 
@@ -29,12 +30,12 @@ update(){
 }
 
 usage(){
-    echo "usage: $0 [option]..."    
+    echo "usage: $SCRIPT [option]..."    
 }
 
 help(){
     usage
-    echo "Add a new $TYPE .tex file to the LaTeX document."
+    echo "Add a new $SCRIPT .tex file to the LaTeX document."
     echo
     echo "  -o,  --output              output filename         (filename.tex)"
     echo "  -d,  --directory           directory               ($TYPE/)"

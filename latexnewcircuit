@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# This script is a template for making new latex docs with cli options
-# example is written for img files
+# This script makes new circuit latex docs with cli options
 
 ## Constants
+
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
+SCRIPT="$(basename $0)"
 TYPE="circuit"
 TYPEDIR="$TYPE/"
 
@@ -22,6 +23,7 @@ write_file(){
         to[C=\$C_1$] +(5,0)
         to[L=\$L_1$] +(0,-5)
         to[short] +(-5,0)
+    ;
     \end{circuitikz}
     \caption[$toc_caption]{$caption}
     \label{circuit:$label}
@@ -35,7 +37,7 @@ update(){
 }
 
 usage(){
-    echo "usage: $0 [option]..."    
+    echo "usage: $SCRIPT [option]..."    
 }
 
 help(){
@@ -53,7 +55,6 @@ help(){
     echo
     echo "Visit https://github.com/tdpage/latex_tools for more info"
 }
-
 
 ## Main
 

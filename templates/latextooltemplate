@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # This script is a template for making new latex docs with cli options
-# example is written for img files
 
 ## Constants
+
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
-TYPE="img"
+SCRIPT="$(basename $0)"
+TYPE="template"
 TYPEDIR="$TYPE/"
 
 ## Functions
@@ -29,7 +30,7 @@ update(){
 }
 
 usage(){
-    echo "usage: $0 [option]..."    
+    echo "usage: $SCRIPT [option]..."    
 }
 
 help(){

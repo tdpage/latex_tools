@@ -3,8 +3,10 @@
 # This script makes a folder structure and basic LaTeX document 
 
 ## Constants
+
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
+SCRIPT="$(basename $0)"
 
 ## Functions
 
@@ -64,7 +66,7 @@ compile(){
 }
 
 usage(){
-    echo "usage: $0 [option]..."    
+    echo "usage: $SCRIPT [option]..."    
 }
 
 help(){

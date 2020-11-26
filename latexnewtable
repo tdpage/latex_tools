@@ -3,8 +3,10 @@
 # This script makes new table latex docs with cli options
 
 ## Constants
+
 RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
+SCRIPT="$(basename $0)"
 TYPE="table"
 TYPEDIR="$TYPE/"
 
@@ -32,7 +34,7 @@ update(){
 }
 
 usage(){
-    echo "usage: $0 [option]..."    
+    echo "usage: $SCRIPT [option]..."    
 }
 
 help(){
