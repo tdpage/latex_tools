@@ -18,6 +18,7 @@ make_file_structure(){
 }
 
 write_preamble(){
+    # write the preamble with useful, common packages for all doc types
     cat <<- _EOF_
 % $TIME_STAMP
 
@@ -25,28 +26,83 @@ write_preamble(){
 \documentclass{scrartcl} % Use the Koma article class
 
 % add packages here.
-\usepackage{siunitx}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{siunitx}
 \usepackage[american,nooldvoltagedirection]{circuitikz}
 \usepackage{verbatim}
+\usepackage{enumerate}
+\usepackage{placeins}
 _EOF_
 }
 
-write_body(){
+write_body_homework(){
+    # write the body template used for numbered homework assignments
     cat <<- _EOF_
     
 %--Body-----------------------------------------------------------------
 \begin{document}
-    \title{Title}
-    \subject{Subtitle}
-    \author{Author}
-    \date{$(date +"%m/%d/%Y")}
+    \title{$title}
+    \subject{$subtitle}
+    \author{$author}
+    \date{$date}
     \maketitle
+    
+    \begin{enumerate}
+        \item Problem 1 
+        
+    \end{enumerate}
+_EOF_
+}
+
+write_body_report(){
+    # write the body template used for writing lab and project reports 
+    cat <<- _EOF_
+    
+%--Title Page------------------------------------------------------------
+\begin{document}
+    \begin{titlepage}
+    \begin{center}
+        \Large
+        Michigan Technological University \\\\
+        \vspace*{1cm}
+        \textbf{$subtitle} \\\\
+        Digital and Nonlinear Control \\\\
+        \vspace{3cm}
+            
+        \Huge
+        \textbf{$title} \\\\
+        \vspace{0.25cm}
+        \Large
+        Lab Experiment XX
+        \vspace{3cm}
+        
+        \Large
+        Submitted by: $author \\\\
+        \vspace{1cm}
+        Lab Instructor: \\\\
+        \vfill
+
+       Date Performed: \\\\
+       Date Submitted: $date \\\\
+    
+    \end{center}
+\end{titlepage}
+
+%--Body-----------------------------------------------------------------
+\section{Objective}
+
+\section{Procedure}
+
+\section{Discussion}
+    
+\section{Conclusion}
+
 _EOF_
 }
 
 write_end_of_doc(){
+    # write the document close
     cat <<- _EOF_
 
 \end{document}
@@ -55,7 +111,16 @@ _EOF_
 
 write_file(){
     write_preamble
-    write_body
+    case $type in
+    
+        homework )   write_body_homework
+                     ;;
+        report   )   write_body_report
+                     ;;
+#         code     )   write_body_code
+#                      ;;
+    esac
+    
     write_end_of_doc
 }
 
@@ -74,9 +139,12 @@ help(){
     echo "Create a new LaTeX document directory and base document"
     echo
     echo "  -o,  --output              output filename         (filename.tex)"
-    echo "  -d,  --directory           directory                       (img/)"
-    
-    echo "  -t,  --type                document type               (homework)"
+    echo "  -d,  --directory           directory name                  (img/)"
+    echo "  -t,  --title               document title           (Homework 05)"
+    echo "  -s,  --subtitle            document subtitle             (EE4252)"
+    echo "  -a,  --author              document author           (Fred Jones)"
+    echo "  -D,  --date                document date            (Spring 2020)"
+    echo "  -T,  --type                document type               (homework)"
     echo "  -c,  --compile             compile the document"
     echo "  -h,  --help                display this help and exit"
     echo
@@ -88,6 +156,10 @@ help(){
 # initialize some fields
 filename=       # filename including extension
 directory=      # directory to place file
+title=          # document title
+subtitle=       # document subtitle
+author=         # document author
+date=           # date
 type=           # document type
 compileFlag=    # compile to PDF
 
@@ -100,7 +172,19 @@ while [ "$1" != "" ]; do
         -d | --directory )      shift
                                 dir=$1
                                 ;;
-        -t | --type      )      shift
+        -t | --title     )      shift
+                                title=$1
+                                ;;                  
+        -s | --subtitle  )      shift
+                                subtitle=$1
+                                ;;
+        -a | --author     )     shift
+                                author=$1
+                                ;;
+        -D | --date      )      shift
+                                date=$1
+                                ;;
+        -T | --type      )      shift
                                 type=$1
                                 ;;
         -c | --compile   )      compileFlag="1"
@@ -118,6 +202,10 @@ done
 [[ "$filename" = "" ]]    && filename="new_document.tex"
 [[ "$dir" = "" ]]         && dir="${filename%.*}/"
 [[ "$type" = "" ]]        && type="homework"
+[[ "$title" = "" ]]       && title="Title"
+[[ "$subtitle" = "" ]]    && subtitle="Subtitle"
+[[ "$author" = "" ]]      && author="Author"
+[[ "$date" = "" ]]        && date=$(date +%m/%d/%Y)
 
 # do some work
 make_file_structure
