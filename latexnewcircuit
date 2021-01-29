@@ -105,7 +105,7 @@ done
 [[ "$imgname" = "" ]]     && imgname=${filename%.*} # filename without extension
 # [[ "$dir" = "" ]]         && dir=""
 [[ "$caption" = "" ]]     && caption=${filename%.*} 
-[[ "$toc_caption" = "" ]] && toc_caption=${filename%.*}
+[[ "$toc_caption" = "" ]] && toc_caption=$caption
 [[ "$label" = "" ]]       && label=${filename%.*}
 # [[ "$ext" = "png" ]]      && ext="png"
 
