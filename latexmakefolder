@@ -30,9 +30,12 @@ write_preamble(){
 \usepackage{graphicx}
 \usepackage{siunitx}
 \usepackage[american,nooldvoltagedirection]{circuitikz}
+\usepackage[numbered]{matlab-prettifier}
 \usepackage{verbatim}
 \usepackage{enumerate}
 \usepackage{placeins}
+
+\lstMakeShortInline[style=Matlab-editor]| % | delineates inline Matlab
 _EOF_
 }
 
@@ -49,7 +52,7 @@ write_body_homework(){
     \maketitle
     
     \begin{enumerate}
-        \item Problem 1 
+        \item
         
     \end{enumerate}
 _EOF_
