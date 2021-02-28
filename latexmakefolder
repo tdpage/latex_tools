@@ -12,7 +12,7 @@ SCRIPT="$(basename $0)"
 
 make_file_structure(){
     [ -d "./$dir" ] || mkdir "./$dir"
-    for subdir in img circuit table tex; do
+    for subdir in img circuit table tex appendix; do
         [ -d "./$dir$subdir" ] || mkdir -p "./$dir$subdir"
     done
 }
