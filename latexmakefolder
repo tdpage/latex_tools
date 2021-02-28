@@ -98,6 +98,9 @@ write_body_report(){
     
 \section{Conclusion}
 
+\appendix
+\section{Matlab Code}
+
 _EOF_
 }
 
