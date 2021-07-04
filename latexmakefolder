@@ -8,6 +8,8 @@ RIGHT_NOW="$(date +"%x %r %Z")"
 TIME_STAMP="Updated $RIGHT_NOW by $USER"
 SCRIPT="$(basename $0)"
 
+TEMPLATEDIR="/home/$USER/bin/latex_tools/templates/"
+
 ## Functions
 
 make_file_structure(){
@@ -17,130 +19,62 @@ make_file_structure(){
     done
 }
 
-write_preamble(){
-    # write the preamble with useful, common packages for all doc types
-    cat <<- _EOF_
+
+
+default="
 % $TIME_STAMP
 
 %--Preamble-------------------------------------------------------------
-\documentclass{scrartcl} % Use the Koma article class
-
-% add packages here.
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{siunitx}
-\usepackage[american,nooldvoltagedirection]{circuitikz}
-\usepackage[numbered]{matlab-prettifier}
-\usepackage{verbatim}
-\usepackage{enumerate}
-\usepackage{placeins}
-
-\lstMakeShortInline[style=Matlab-editor]| % | delineates inline Matlab
-_EOF_
-}
-
-write_body_homework(){
-    # write the body template used for numbered homework assignments
-    cat <<- _EOF_
-    
-%--Body-----------------------------------------------------------------
-\begin{document}
-    \title{$title}
-    \subject{$subtitle}
-    \author{$author}
-    \date{$date}
-    \maketitle
-    
-    \begin{enumerate}
-        \item
-        
-    \end{enumerate}
-_EOF_
-}
-
-write_body_report(){
-    # write the body template used for writing lab and project reports 
-    cat <<- _EOF_
-    
-%--Title Page------------------------------------------------------------
-\begin{document}
-    \begin{titlepage}
-    \begin{center}
-        \Large
-        Michigan Technological University \\\\
-        \vspace*{1cm}
-        \textbf{$subtitle} \\\\
-        Digital and Nonlinear Control \\\\
-        \vspace{3cm}
-            
-        \Huge
-        \textbf{$title} \\\\
-        \vspace{0.25cm}
-        \Large
-        Lab Experiment XX
-        \vspace{3cm}
-        
-        \Large
-        Submitted by: $author \\\\
-        \vspace{1cm}
-        Lab Instructor: \\\\
-        \vfill
-
-       Date Performed: \\\\
-       Date Submitted: $date \\\\
-    
-    \end{center}
-\end{titlepage}
+\documentclass{scrartcl}
 
 %--Body-----------------------------------------------------------------
-\section{Objective}
-
-\section{Procedure}
-
-\section{Discussion}
-    
-\section{Conclusion}
-
-\appendix
-\section{Matlab Code}
-
-_EOF_
-}
-
-write_end_of_doc(){
-    # write the document close
-    cat <<- _EOF_
+\begin{document}
 
 \end{document}
-_EOF_
+"
+
+function load_template(){
+    if [ $type = "default" ] 
+    then
+        template=$default
+    else
+        template=$(cat "$TEMPLATEDIR$type.tex") || EXIT_CODE=$?
+        # Catch an exit code if the template load was successful or not
+        case $EXIT_CODE in
+            
+            # unsuccessful, fall back to default
+            1 )             echo "$type template not found in $TEMPLATEDIR!"
+                            echo "Falling back to default template"
+                            template=$default
+                            ;;
+            # successful, preform replacement of items
+            0 )             template=${template//'$TIME_STAMP'/$TIME_STAMP}
+                            template=${template//'$title'/$title}
+                            template=${template//'$subtitle'/$subtitle}
+                            template=${template//'$author'/$author}
+                            template=${template//'$date'/$date}
+                            ;;
+        esac
+    fi
+    
 }
 
-write_file(){
-    write_preamble
-    case $type in
-    
-        homework )   write_body_homework
-                     ;;
-        report   )   write_body_report
-                     ;;
-#         code     )   write_body_code
-#                      ;;
-    esac
-    
-    write_end_of_doc
+function write_file(){
+
+    echo "$template"
 }
 
-compile(){
+function compile(){
     cd $dir
     pdflatex ./$filename
     cd - > /dev/null
 }
 
-usage(){
+function usage(){
     echo "usage: $SCRIPT [option]..."    
 }
 
-help(){
+function help(){
     usage
     echo "Create a new LaTeX document directory and base document"
     echo
@@ -207,7 +141,7 @@ done
 # if certain fields haven't been entered, set some defaults based on the filename
 [[ "$filename" = "" ]]    && filename="new_document.tex"
 [[ "$dir" = "" ]]         && dir="${filename%.*}/"
-[[ "$type" = "" ]]        && type="homework"
+[[ "$type" = "" ]]        && type="default"
 [[ "$title" = "" ]]       && title="Title"
 [[ "$subtitle" = "" ]]    && subtitle="Subtitle"
 [[ "$author" = "" ]]      && author="Author"
@@ -215,6 +149,8 @@ done
 
 # do some work
 make_file_structure
+load_template
+
 [[ -f "./$dir$filename" ]] || write_file > ./$dir$filename
 [[ "$compileFlag" ]] && compile
 exit 0
