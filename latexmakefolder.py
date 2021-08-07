@@ -55,14 +55,21 @@ class latexmakefolder():
         # todo?: check if the output file has .tex extension or not
         
         path = "./" + "".join(self.directory)
+        
         for subdir in ['circuit/', 'tex/', 'img/', 'table/']:
-            os.makedirs(path + subdir)
+            try:
+                os.makedirs(path + subdir)
+            except:
+                print('directory "' + path + subdir + '" already exists! skipping creation')
             
     def write_file(self):
         path = "./" + "".join(self.directory) + "".join(self.output)
-        #print(path)
-        with open(path, 'w') as out_file:
-            out_file.write("Hello, World!")
+        try:
+            with open(path, 'w') as out_file:
+                out_file.write("Hello, World!")
+        except:
+            sys.stderr('cannot open "' + path + '"')
+            sys.exit(1)
         
     
 def main():
