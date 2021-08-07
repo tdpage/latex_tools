@@ -57,11 +57,18 @@ class latexmakefolder():
         path = "./" + "".join(self.directory)
         for subdir in ['circuit/', 'tex/', 'img/', 'table/']:
             os.makedirs(path + subdir)
-    
+            
+    def write_file(self):
+        path = "./" + "".join(self.directory) + "".join(self.output)
+        #print(path)
+        with open(path, 'w') as out_file:
+            out_file.write("Hello, World!")
+        
     
 def main():
     latex_obj = latexmakefolder()
     latex_obj.make_folders()
+    latex_obj.write_file()
     
 
 
