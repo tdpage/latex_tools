@@ -48,10 +48,20 @@ class latexmakefolder():
         
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
+        
+    def make_folders(self):
+        # todo: check if the directory is a relative or absolute path
+        # todo: auto-append trailing / to directory if not present
+        # todo?: check if the output file has .tex extension or not
+        
+        path = "./" + "".join(self.directory)
+        for subdir in ['circuit/', 'tex/', 'img/', 'table/']:
+            os.makedirs(path + subdir)
     
     
 def main():
     latex_obj = latexmakefolder()
+    latex_obj.make_folders()
     
 
 
