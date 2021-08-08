@@ -39,15 +39,32 @@ class latexmakefolder():
         self.file_contents = str()
         
         # set the arguments 
-        self.parser = argparse.ArgumentParser(description='Create a new LaTeX document directory and base document.', epilog='Visit https://github.com/tdpage/latex_tools for more info')
-        self.parser.add_argument('-o', '--output', default='new_document.tex', nargs=1, metavar='file', help='output file')
-        self.parser.add_argument('-d', '--directory',default='new_document/', nargs=1, metavar='dir', help='output directory')
-        self.parser.add_argument('-t', '--title', default='title', nargs=1, metavar='"doc title"', help='document title')
-        self.parser.add_argument('-s', '--subtitle', default='subtitle', nargs=1, metavar='"doc subtitle"', help='document subtitle')
-        self.parser.add_argument('-a', '--author', default=CUR_USR, nargs=1, metavar='"author name"', help='document author')
-        self.parser.add_argument('-D', '--date', default=TIMESTAMP, nargs=1, metavar='MM/DD/YYYY', help='document date')
-        self.parser.add_argument('-T', '--template',default='default', nargs=1, metavar='template', help='template to use')
-        self.parser.add_argument('-c', '--compile', default='pdflatex', nargs='?', metavar='compiler', help='LaTeX compiler with args')
+        self.parser = argparse.ArgumentParser(description='Create a new LaTeX document directory and base document.',
+                                              epilog='Visit https://github.com/tdpage/latex_tools for more info.')
+        self.parser.add_argument('-o', '--output', default='new_document.tex',
+                                 nargs=1, metavar='file',
+                                 help='output file')
+        self.parser.add_argument('-d', '--directory', default='new_document/',
+                                 nargs=1, metavar='dir',
+                                 help='output directory')
+        self.parser.add_argument('-t', '--title', default='title',
+                                 nargs=1, metavar='"doc title"',
+                                 help='document title')
+        self.parser.add_argument('-s', '--subtitle', default='subtitle',
+                                 nargs=1, metavar='"doc subtitle"',
+                                 help='document subtitle')
+        self.parser.add_argument('-a', '--author', default=CUR_USR,
+                                 nargs=1, metavar='"author name"',
+                                 help='document author')
+        self.parser.add_argument('-D', '--date', default=TIMESTAMP,
+                                 nargs=1, metavar='MM/DD/YYYY',
+                                 help='document date')
+        self.parser.add_argument('-T', '--template', default='default',
+                                 nargs=1, metavar='template',
+                                 help='template to use')
+        self.parser.add_argument('-c', '--compile', default='pdflatex',
+                                 nargs='?', metavar='compiler',
+                                 help='LaTeX compiler with args')
         
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
