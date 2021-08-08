@@ -32,6 +32,7 @@ from datetime import datetime
 
 class latexmakefolder():
     def __init__(self):
+        
         # specify some meta information
         CUR_USR=pwd.getpwuid(os.getuid()).pw_name
         TIMESTAMP=datetime.now().replace(microsecond=0).isoformat()
@@ -41,65 +42,86 @@ class latexmakefolder():
         # set the arguments 
         self.parser = argparse.ArgumentParser(description='Create a new LaTeX document directory and base document.',
                                               epilog='Visit https://github.com/tdpage/latex_tools for more info.')
-        self.parser.add_argument('-o', '--output', default='new_document.tex',
+        self.parser.add_argument('-o', '--output', default=['new_document.tex'],
                                  nargs=1, metavar='file',
                                  help='output file')
-        self.parser.add_argument('-d', '--directory', default='new_document/',
+        self.parser.add_argument('-d', '--directory', default=['new_document/'],
                                  nargs=1, metavar='dir',
                                  help='output directory')
-        self.parser.add_argument('-t', '--title', default='title',
+        self.parser.add_argument('-t', '--title', default=['title'],
                                  nargs=1, metavar='"doc title"',
                                  help='document title')
-        self.parser.add_argument('-s', '--subtitle', default='subtitle',
+        self.parser.add_argument('-s', '--subtitle', default=['subtitle'],
                                  nargs=1, metavar='"doc subtitle"',
                                  help='document subtitle')
-        self.parser.add_argument('-a', '--author', default=CUR_USR,
+        self.parser.add_argument('-a', '--author', default=[CUR_USR],
                                  nargs=1, metavar='"author name"',
                                  help='document author')
-        self.parser.add_argument('-D', '--date', default=TIMESTAMP,
+        self.parser.add_argument('-D', '--date', default=[TIMESTAMP],
                                  nargs=1, metavar='MM/DD/YYYY',
                                  help='document date')
-        self.parser.add_argument('-T', '--template', default='default',
+        self.parser.add_argument('-T', '--template', default=['default'],
                                  nargs=1, metavar='template',
                                  help='template to use')
-        self.parser.add_argument('-c', '--compile', default='pdflatex',
+        self.parser.add_argument('-c', '--compile', default=['pdflatex'],
                                  nargs='?', metavar='compiler',
                                  help='LaTeX compiler with args')
         
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
         
+        self.default_template = r'''
+$TIMESTAMP
+
+\documentclass{article}
+
+\begin{document}
+\author{$author}
+\title{$title}
+\subtitle{$subtitle}
+\date{$date}
+\end{document}
+
+'''
+        
     def make_folders(self):
         # todo: check if the directory is a relative or absolute path
         # todo: auto-append trailing / to directory if not present
         # todo?: check if the output file has .tex extension or not
         
-        path = "./" + "".join(self.directory)
+        path = "./" + self.directory[0]
         
         for subdir in ['circuit/', 'tex/', 'img/', 'table/']:
             try:
                 os.makedirs(path + subdir)
             except:
                 print('directory "' + path + subdir + '" already exists! skipping creation')
+                        
+    def load_template(self):
+        # todo: allow changing templates
+        # todo: read template from config dir
+        
+        if self.template[0] == "default":
+            self.file_contents = self.default_template
+        
+        else:
+            path = os.path.expanduser('~/bin/latex_tools/templates/')
+            try:
+                with open(path + self.template[0] + '.tex', 'r') as in_file:
+                    self.file_contents = in_file.read()
+            except:
+                sys.stderr.write('cannot read "' + self.template[0] + '" template!\n')
+                sys.exit(1)
             
     def write_file(self):
-        path = "./" + "".join(self.directory) + "".join(self.output)
+        path = "./" + self.directory[0]
+         
         try:
-            with open(path, 'w') as out_file:
+            with open(path  + self.output[0], 'w') as out_file:
                 out_file.write(self.file_contents)
         except:
             sys.stderr('cannot open "' + path + '"')
             sys.exit(1)
-            
-    def load_template(self):
-        path = os.path.expanduser('~/bin/latex_tools/templates/')
-        try:
-            with open(path + ''.join(self.template) + '.tex', 'r') as in_file:
-                self.file_contents = in_file.read()
-        except:
-            sys.stderr.write('cannot read "' + ''.join(self.template) + '" template!\n')
-            sys.exit(1)
-            
             
         
         
