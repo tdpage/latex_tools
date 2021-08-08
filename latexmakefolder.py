@@ -42,26 +42,26 @@ class latexmakefolder():
         # set the arguments 
         self.parser = argparse.ArgumentParser(description='Create a new LaTeX document directory and base document.',
                                               epilog='Visit https://github.com/tdpage/latex_tools for more info.')
-        self.parser.add_argument('-o', '--output', default=['new_document.tex'],
-                                 nargs=1, metavar='file',
+        self.parser.add_argument('-o', '--output', default='new_document.tex',
+                                 nargs='?', metavar='file',
                                  help='output file')
-        self.parser.add_argument('-d', '--directory', default=['new_document/'],
-                                 nargs=1, metavar='dir',
+        self.parser.add_argument('-d', '--directory', default='new_document/',
+                                 nargs='?', metavar='dir',
                                  help='output directory')
-        self.parser.add_argument('-t', '--title', default=['title'],
-                                 nargs=1, metavar='"doc title"',
+        self.parser.add_argument('-t', '--title', default='title',
+                                 nargs='?', metavar='"doc title"',
                                  help='document title')
-        self.parser.add_argument('-s', '--subtitle', default=['subtitle'],
-                                 nargs=1, metavar='"doc subtitle"',
+        self.parser.add_argument('-s', '--subtitle', default='subtitle',
+                                 nargs='?', metavar='"doc subtitle"',
                                  help='document subtitle')
-        self.parser.add_argument('-a', '--author', default=[self.CUR_USR],
-                                 nargs=1, metavar='"author name"',
+        self.parser.add_argument('-a', '--author', default=self.CUR_USR,
+                                 nargs='?', metavar='"author name"',
                                  help='document author')
-        self.parser.add_argument('-D', '--date', default=[datetime.now().strftime('%d/%m/%Y')],
-                                 nargs=1, metavar='MM/DD/YYYY',
+        self.parser.add_argument('-D', '--date', default=datetime.now().strftime('%d/%m/%Y'),
+                                 nargs='?', metavar='MM/DD/YYYY',
                                  help='document date')
-        self.parser.add_argument('-T', '--template', default=['default'],
-                                 nargs=1, metavar='template',
+        self.parser.add_argument('-T', '--template', default='default',
+                                 nargs='?', metavar='template',
                                  help='template to use')
         self.parser.add_argument('-c', '--compile', default=False,
                                  nargs='?', metavar='compiler',
@@ -93,7 +93,7 @@ class latexmakefolder():
         # todo: auto-append trailing / to directory if not present
         # todo?: check if the output file has .tex extension or not
         
-        path = "./" + self.directory[0]
+        path = "./" + self.directory
         
         for subdir in ['circuit/', 'tex/', 'img/', 'table/']:
             try:
@@ -105,30 +105,30 @@ class latexmakefolder():
         # todo: allow changing templates
         # todo: read template from config dir
         
-        if self.template[0] == "default":
+        if self.template == "default":
             self.file_contents = self.default_template
         
         else:
             path = os.path.expanduser('~/bin/latex_tools/templates/')
             try:
-                with open(path + self.template[0] + '.tex', 'r') as in_file:
+                with open(path + self.template + '.tex', 'r') as in_file:
                     self.file_contents = in_file.read()
             except:
-                sys.stderr.write('cannot find "' + self.template[0] + '" template!\n')
+                sys.stderr.write('cannot find "' + self.template + '" template!\n')
                 sys.exit(1)
     
     def replace_contents(self):
         self.file_contents = self.file_contents.replace('$TIMESTAMP', self.TIMESTAMP)
-        self.file_contents = self.file_contents.replace('$author', self.author[0])
-        self.file_contents = self.file_contents.replace('$title', self.title[0])
-        self.file_contents = self.file_contents.replace('$subtitle', self.subtitle[0])
-        self.file_contents = self.file_contents.replace('$date', self.date[0])
+        self.file_contents = self.file_contents.replace('$author', self.author)
+        self.file_contents = self.file_contents.replace('$title', self.title)
+        self.file_contents = self.file_contents.replace('$subtitle', self.subtitle)
+        self.file_contents = self.file_contents.replace('$date', self.date)
     
     def write_file(self):
-        path = "./" + self.directory[0]
+        path = "./" + self.directory
          
         try:
-            with open(path  + self.output[0], 'w') as out_file:
+            with open(path  + self.output, 'w') as out_file:
                 out_file.write(self.file_contents)
         except:
             sys.stderr('cannot open "' + path + '"')
@@ -140,9 +140,9 @@ class latexmakefolder():
         
         # only compile if the flag was passed
         if self.compile:
-            path = "./" + self.directory[0]
+            path = "./" + self.directory
             os.chdir(path)
-            os.system(self.compile + " " + self.output[0])
+            os.system(self.compile + " " + self.output)
             os.chdir('..')
             
 def main():
