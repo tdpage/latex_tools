@@ -34,8 +34,8 @@ class latexmakefolder():
     def __init__(self):
         
         # specify some meta information
-        CUR_USR=pwd.getpwuid(os.getuid()).pw_name
-        TIMESTAMP=datetime.now().replace(microsecond=0).isoformat()
+        self.CUR_USR = pwd.getpwuid(os.getuid()).pw_name
+        self.TIMESTAMP = datetime.now().strftime('%d/%m/%Y %I:%M %p') + ' by ' + self.CUR_USR
         
         self.file_contents = str()
         
@@ -54,10 +54,10 @@ class latexmakefolder():
         self.parser.add_argument('-s', '--subtitle', default=['subtitle'],
                                  nargs=1, metavar='"doc subtitle"',
                                  help='document subtitle')
-        self.parser.add_argument('-a', '--author', default=[CUR_USR],
+        self.parser.add_argument('-a', '--author', default=[self.CUR_USR],
                                  nargs=1, metavar='"author name"',
                                  help='document author')
-        self.parser.add_argument('-D', '--date', default=[TIMESTAMP],
+        self.parser.add_argument('-D', '--date', default=[datetime.now().strftime('%d/%m/%Y')],
                                  nargs=1, metavar='MM/DD/YYYY',
                                  help='document date')
         self.parser.add_argument('-T', '--template', default=['default'],
@@ -71,15 +71,18 @@ class latexmakefolder():
         self.parser.parse_args(namespace=self)
         
         self.default_template = r'''
-$TIMESTAMP
+% $TIMESTAMP
 
-\documentclass{article}
+\documentclass{scrartcl}
 
 \begin{document}
 \author{$author}
 \title{$title}
 \subtitle{$subtitle}
 \date{$date}
+
+\maketitle
+
 \end{document}
 
 '''
@@ -110,9 +113,16 @@ $TIMESTAMP
                 with open(path + self.template[0] + '.tex', 'r') as in_file:
                     self.file_contents = in_file.read()
             except:
-                sys.stderr.write('cannot read "' + self.template[0] + '" template!\n')
+                sys.stderr.write('cannot find "' + self.template[0] + '" template!\n')
                 sys.exit(1)
-            
+    
+    def replace_contents(self):
+        self.file_contents = self.file_contents.replace('$TIMESTAMP', self.TIMESTAMP)
+        self.file_contents = self.file_contents.replace('$author', self.author[0])
+        self.file_contents = self.file_contents.replace('$title', self.title[0])
+        self.file_contents = self.file_contents.replace('$subtitle', self.subtitle[0])
+        self.file_contents = self.file_contents.replace('$date', self.date[0])
+    
     def write_file(self):
         path = "./" + self.directory[0]
          
@@ -130,6 +140,7 @@ def main():
     latex_obj = latexmakefolder()
     latex_obj.make_folders()
     latex_obj.load_template()
+    latex_obj.replace_contents()
     latex_obj.write_file()
     
 
