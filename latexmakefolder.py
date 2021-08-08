@@ -25,6 +25,7 @@
 
 import argparse
 import os
+import sys
 import pwd
 from datetime import datetime
 
@@ -34,6 +35,8 @@ class latexmakefolder():
         # specify some meta information
         CUR_USR=pwd.getpwuid(os.getuid()).pw_name
         TIMESTAMP=datetime.now().replace(microsecond=0).isoformat()
+        
+        self.file_contents = str()
         
         # set the arguments 
         self.parser = argparse.ArgumentParser(description='Create a new LaTeX document directory and base document.', epilog='Visit https://github.com/tdpage/latex_tools for more info')
@@ -66,15 +69,28 @@ class latexmakefolder():
         path = "./" + "".join(self.directory) + "".join(self.output)
         try:
             with open(path, 'w') as out_file:
-                out_file.write("Hello, World!")
+                out_file.write(self.file_contents)
         except:
             sys.stderr('cannot open "' + path + '"')
             sys.exit(1)
+            
+    def load_template(self):
+        path = os.path.expanduser('~/bin/latex_tools/templates/')
+        try:
+            with open(path + ''.join(self.template) + '.tex', 'r') as in_file:
+                self.file_contents = in_file.read()
+        except:
+            sys.stderr.write('cannot read "' + ''.join(self.template) + '" template!\n')
+            sys.exit(1)
+            
+            
+        
         
     
 def main():
     latex_obj = latexmakefolder()
     latex_obj.make_folders()
+    latex_obj.load_template()
     latex_obj.write_file()
     
 
