@@ -63,8 +63,9 @@ class latexmakefolder():
         self.parser.add_argument('-T', '--template', default=['default'],
                                  nargs=1, metavar='template',
                                  help='template to use')
-        self.parser.add_argument('-c', '--compile', default=['pdflatex'],
+        self.parser.add_argument('-c', '--compile', default=False,
                                  nargs='?', metavar='compiler',
+                                 const="pdflatex",
                                  help='LaTeX compiler with args')
         
         # parse the args and place them as attributes of self
@@ -133,15 +134,24 @@ class latexmakefolder():
             sys.stderr('cannot open "' + path + '"')
             sys.exit(1)
             
+    def compile_doc(self):
+        # todo: verify safe execution of code
+        # todo: exception handling
         
-        
-    
+        # only compile if the flag was passed
+        if self.compile:
+            path = "./" + self.directory[0]
+            os.chdir(path)
+            os.system(self.compile + " " + self.output[0])
+            os.chdir('..')
+            
 def main():
     latex_obj = latexmakefolder()
     latex_obj.make_folders()
     latex_obj.load_template()
     latex_obj.replace_contents()
     latex_obj.write_file()
+    latex_obj.compile_doc()
     
 
 
