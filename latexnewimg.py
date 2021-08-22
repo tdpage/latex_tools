@@ -65,8 +65,7 @@ class latexnewimg():
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
         
-        self.file_contents = r'''
-% $TIMESTAMP
+        self.file_contents = r'''% $TIMESTAMP
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth]{./$dir$imgname.$ext}
@@ -85,7 +84,15 @@ class latexnewimg():
         self.file_contents = self.file_contents.replace('$label', self.label)
     
     def write_file(self):
-        path = "./" + self.directory
+        
+        # check if the img/ directory exists. If so, use that as a base
+        if os.path.exists('./img/'):
+            path = './img/' + self.directory
+        else:
+            path = './' + self.directory
+        
+        if not os.path.exists(path):
+            os.makedirs(path)
          
         try:
             with open(path  + self.output, 'w') as out_file:
