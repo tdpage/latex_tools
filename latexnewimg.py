@@ -87,24 +87,36 @@ class latexnewimg():
         
         # check if the img/ directory exists. If so, use that as a base
         if os.path.exists('./img/'):
-            path = './img/' + self.directory
+            self.path = './img/' + self.directory
         else:
-            path = './' + self.directory
+            self.path = './' + self.directory
         
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
          
         try:
-            with open(path  + self.output, 'w') as out_file:
+            with open(self.path  + self.output, 'w') as out_file:
                 out_file.write(self.file_contents)
         except:
-            print('cannot open "' + path + '"', file=sys.stderr)
+            print('cannot open "' + self.path + '"', file=sys.stderr)
             sys.exit(1)
             
     def update_lists(self):        
         # only compile if the flag was passed
         if self.update:
-            pass
+            try:
+                with open('./listoffloats.tex', 'a') as out_file:
+                    out_file.write(r'\input{'+ self.path + self.output + '}\n')
+            except IOError:
+                print('cannot open "' + path + '"', file=sys.stderr)
+                sys.exit(1)
+                
+            try:
+                with open('./listofrefs.tex', 'a') as out_file:
+                    out_file.write(r'\ref{fig:'+ self.label + '}\n')
+            except IOError:
+                print('cannot open "' + path + '"', file=sys.stderr)
+                sys.exit(1)
             
 def main():
     latex_obj = latexnewimg()
