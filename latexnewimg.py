@@ -48,14 +48,14 @@ class latexnewimg():
         self.parser.add_argument('-d', '--directory', default='img/',
                                  nargs='?', metavar='dir',
                                  help='output directory')
-        self.parser.add_argument('-c', '--caption', default='caption',
+        self.parser.add_argument('-c', '--caption', default=False,
                                  nargs='?', metavar='"img caption"',
                                  help='document subtitle')
-        self.parser.add_argument('-t', '--toc', default='caption',
+        self.parser.add_argument('-t', '--toc', default=False,
                                  nargs='?', metavar='"TOC caption"',
                                  help='table of contents caption')
         self.parser.add_argument('-l', '--label', default=self.CUR_USR,
-                                 nargs='?', metavar='label',
+                                 nargs='?', metavar=False,
                                  help='reference label')
         self.parser.add_argument('-e', '--ext', default='png',
                                  nargs='?', metavar='file extension',
@@ -64,6 +64,16 @@ class latexnewimg():
                                  help='update reflist.tex and floatlist.tex')
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
+        
+        docname = self.output.split('.')[0]
+        if not self.label:
+            self.label = docname
+            
+        if not self.caption:
+            self.caption = docname
+        
+        if not self.toc:
+            self.toc = self.caption
         
         self.file_contents = r'''% $TIMESTAMP
 \begin{figure}[!htbp]

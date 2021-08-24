@@ -48,19 +48,29 @@ class latexnewcircuit():
         self.parser.add_argument('-d', '--directory', default='',
                                  nargs='?', metavar='dir',
                                  help='output directory')
-        self.parser.add_argument('-c', '--caption', default='caption',
+        self.parser.add_argument('-c', '--caption', default=False,
                                  nargs='?', metavar='"table caption"',
                                  help='table caption')
-        self.parser.add_argument('-t', '--toc', default='caption',
+        self.parser.add_argument('-t', '--toc', default=False,
                                  nargs='?', metavar='"TOC caption"',
                                  help='table of contents caption')
-        self.parser.add_argument('-l', '--label', default='label',
+        self.parser.add_argument('-l', '--label', default=False,
                                  nargs='?', metavar='label',
                                  help='reference label')
         self.parser.add_argument('-u', '--update', action='store_true',
                                  help='update reflist.tex and floatlist.tex')
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
+        
+        docname = self.output.split('.')[0]
+        if not self.label:
+            self.label = docname
+            
+        if not self.caption:
+            self.caption = docname
+        
+        if not self.toc:
+            self.toc = self.caption
         
         self.file_contents = r'''% $TIMESTAMP
 \begin{figure}[!htbp]
@@ -114,7 +124,7 @@ class latexnewcircuit():
                 
             try:
                 with open('./listofrefs.tex', 'a') as out_file:
-                    out_file.write(r'\ref{fig:'+ self.label + '}\n')
+                    out_file.write(r'\ref{circuit:'+ self.label + '}\n')
             except IOError:
                 print('cannot open "' + path + '"', file=sys.stderr)
                 sys.exit(1)
