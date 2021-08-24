@@ -45,19 +45,19 @@ class latexmakefolder():
         self.parser.add_argument('-o', '--output', default='new_document.tex',
                                  nargs='?', metavar='file',
                                  help='output file')
-        self.parser.add_argument('-d', '--directory', default='new_document/',
+        self.parser.add_argument('-d', '--directory', default=False,
                                  nargs='?', metavar='dir',
                                  help='output directory')
-        self.parser.add_argument('-t', '--title', default='title',
+        self.parser.add_argument('-t', '--title', default=False,
                                  nargs='?', metavar='"doc title"',
                                  help='document title')
-        self.parser.add_argument('-s', '--subtitle', default='subtitle',
+        self.parser.add_argument('-s', '--subtitle', default='',
                                  nargs='?', metavar='"doc subtitle"',
                                  help='document subtitle')
         self.parser.add_argument('-a', '--author', default=self.CUR_USR,
                                  nargs='?', metavar='"author name"',
                                  help='document author')
-        self.parser.add_argument('-D', '--date', default=datetime.now().strftime('%d/%m/%Y'),
+        self.parser.add_argument('-D', '--date', default=datetime.now().strftime('%m/%d/%Y'),
                                  nargs='?', metavar='MM/DD/YYYY',
                                  help='document date')
         self.parser.add_argument('-T', '--template', default='default',
@@ -67,9 +67,19 @@ class latexmakefolder():
                                  nargs='?', metavar='compiler',
                                  const="pdflatex",
                                  help='LaTeX compiler with args')
-        
+
         # parse the args and place them as attributes of self
         self.parser.parse_args(namespace=self)
+        
+        
+        # set some default arguments based on the output filename if they weren't specified
+        docname = self.output.split('.')[0]
+        if not self.directory:
+            self.directory = docname + '/'
+            
+        if not self.title:
+            self.title = docname.replace('_', ' ')
+        
         
         self.default_template = r'''
 % $TIMESTAMP
