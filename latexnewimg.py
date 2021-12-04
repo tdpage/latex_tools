@@ -45,7 +45,7 @@ class latexnewimg():
         self.parser.add_argument('-o', '--output', default='new_img.tex',
                                  nargs='?', metavar='file',
                                  help='output file')
-        self.parser.add_argument('-d', '--directory', default='img/',
+        self.parser.add_argument('-d', '--directory', default='',
                                  nargs='?', metavar='dir',
                                  help='output directory')
         self.parser.add_argument('-c', '--caption', default=False,
@@ -54,7 +54,7 @@ class latexnewimg():
         self.parser.add_argument('-t', '--toc', default=False,
                                  nargs='?', metavar='"TOC caption"',
                                  help='table of contents caption')
-        self.parser.add_argument('-l', '--label', default=self.CUR_USR,
+        self.parser.add_argument('-l', '--label', default=False,
                                  nargs='?', metavar=False,
                                  help='reference label')
         self.parser.add_argument('-e', '--ext', default='png',
@@ -74,11 +74,17 @@ class latexnewimg():
         
         if not self.toc:
             self.toc = self.caption
+            
+        # check if the img/ directory exists. If so, use that as a base
+        if os.path.exists('./img/'):
+            self.directory = './img/' + self.directory
+        else:
+            self.directory = './' + self.directory
         
         self.file_contents = r'''% $TIMESTAMP
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\textwidth]{./$dir$imgname.$ext}
+    \includegraphics[width=\textwidth]{$dir$imgname.$ext}
     \caption[$toc_caption]{$caption}
     \label{fig:$label}
 \end{figure}
@@ -95,20 +101,16 @@ class latexnewimg():
     
     def write_file(self):
         
-        # check if the img/ directory exists. If so, use that as a base
-        if os.path.exists('./img/'):
-            self.path = './img/' + self.directory
-        else:
-            self.path = './' + self.directory
+
         
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
          
         try:
-            with open(self.path  + self.output, 'w') as out_file:
+            with open(self.directory + self.output, 'w') as out_file:
                 out_file.write(self.file_contents)
         except:
-            print('cannot open "' + self.path + '"', file=sys.stderr)
+            print('cannot open "' + self.directory + '"', file=sys.stderr)
             sys.exit(1)
             
     def update_lists(self):        
@@ -116,16 +118,16 @@ class latexnewimg():
         if self.update:
             try:
                 with open('./listoffloats.tex', 'a') as out_file:
-                    out_file.write(r'\input{'+ self.path + self.output + '}\n')
+                    out_file.write(r'\input{'+ self.directory + self.output + '}\n')
             except IOError:
-                print('cannot open "' + path + '"', file=sys.stderr)
+                print('cannot open "' + self.directory + '"', file=sys.stderr)
                 sys.exit(1)
                 
             try:
                 with open('./listofrefs.tex', 'a') as out_file:
                     out_file.write(r'\ref{fig:'+ self.label + '}\n')
             except IOError:
-                print('cannot open "' + path + '"', file=sys.stderr)
+                print('cannot open "' + self.directory + '"', file=sys.stderr)
                 sys.exit(1)
             
 def main():
