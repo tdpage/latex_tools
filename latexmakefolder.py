@@ -35,7 +35,7 @@ class latexmakefolder():
         
         # specify some meta information
         self.CUR_USR = pwd.getpwuid(os.getuid()).pw_name
-        self.TIMESTAMP = datetime.now().strftime('%d/%m/%Y %I:%M %p') + ' by ' + self.CUR_USR
+        self.TIMESTAMP = datetime.now().strftime('%m/%d/%Y %I:%M %p') + ' by ' + self.CUR_USR
         
         self.file_contents = str()
         
